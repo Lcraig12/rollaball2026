@@ -1,32 +1,37 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using TMPro;
 
 public class PlayerController : MonoBehaviour {
 
     Rigidbody rb;
-    Vector2 movementVector;
-    Vector3 actualVector;
-    float movementX, movementY;
+    private float movementX, movementY;
     public float speed = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public GameObject pickup_Parent;
+    public GameObject Pickup_Parent;
     public GameObject[] pickup;
-    private int score;
+    private int count;
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
+
+    private float spawnrange = 5f;
     void Start()
+    
     {
-        pickup = new GameObject[1000];
-        speed= 10f;
-        score = 0;
+        pickup = new GameObject[1];
+        speed= 8f;
+        count = 0;
         winTextObject.SetActive(false);
         SetCountText();
         rb = GetComponent<Rigidbody>();
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 12; i++)
         {
-            pickup[i] = GameObject.Instantiate(pickup_Parent);
-            pickup[i].transform.position = new Vector3(i, 1f, 0);
+            float randomXVal = Random.Range(-spawnrange, spawnrange);
+            float randomYVal = Random.Range(-spawnrange, spawnrange);
+            pickup[i] = GameObject.Instantiate(Pickup_Parent);
+            pickup[i].transform.position = new Vector3(randomXVal, 0.0f, randomYVal);
         }
 
     }
@@ -40,29 +45,29 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        actualVector = new Vector3 (movementX, 0f, movementY);
-        rb.AddForce(actualVector * speed);
+        Vector3 movement = new Vector3 (movementX, 0f, movementY);
+        rb.AddForce(movement * speed);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Point"))
+        if (other.gameObject.CompareTag("Pickup"))
         {
             other.gameObject.SetActive(false);
-            score++;
+            count++;
 
             SetCountText();
 
         }
     }
-     // Function to update the displayed count of "PickUp" objects collected.
+    //  Function to update the displayed count of "PickUp" objects collected.
  void SetCountText() 
     {
  // Update the count text with the current count.
-        countText.text = "Count: " + score.ToString();
+        countText.text = "Count: " + count.ToString();
 
  // Check if the count has reached or exceeded the win condition.
- if (score >= 10)
+ if (count >= 12)
         {
  // Display the win text.
             winTextObject.SetActive(true);
